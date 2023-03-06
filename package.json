@@ -1,0 +1,15 @@
+{
+  "name": "AIS_Simulator",
+  "version": "1.0.0",
+  "scripts": {
+    "processAIS1": "node processAISFile.js --file ../../Downloads/AIS/AIS_2022_01_01.csv --dir ships",
+    "processAIS2": "node processAISFile.js --file ../../Downloads/AIS/AIS_2022_01_02.csv --dir ships",
+    "transmit": "node shipSim.js --files ships/215071000.csv",
+    "findMoving": "node findMoving.js --dir ships",
+    "findGroups": "node findGroups.js --dir ships"
+  },
+  "dependencies": {
+    "commander": "^10.0.0",
+    "event-stream": "^4.0.1"
+  }
+}
