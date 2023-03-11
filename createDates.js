@@ -6,16 +6,17 @@ const path = require('path');
 
 
 program
-    .option('-d, --dir <directory>')
+    .option('-s, --ships <directory>')
+    .option('-d, --dates <directory>')
 
 program.parse();
 
 const options = program.opts();
 
-let dirname = options.dir;
+let dirname = options.ships;
 let filenames = fs.readdirSync(dirname);
 
-let _locations = {};
+let _dates = {};
 
 for (let i in filenames) {
     let fileString = filenames[i];
@@ -25,19 +26,17 @@ for (let i in filenames) {
         let str = fs.readFileSync(filename).toString('utf-8');
         str.split(/\n/).forEach((line) => {
             let [MMSI, BaseDateTime, LAT, LONG, SOG, COG, Heading, VesselName, IMO, CallSign, VesselType, Status, Length, Width, Draft, Cargo, TransceiverClass] = line.split(/,/);
-            if(Number(SOG) > 1) {
+            let BaseDate = BaseDateTime;
                 let latN = Math.round(LAT);
                 let longN = Math.round(LONG);
-                let key = `${latN}_${longN}`;
-                if(!_locations.hasOwnProperty(key)) {
-                    console.log("New Group:", key);
-                    _locations[key] = {};
+                if(!_dates.hasOwnProperty(BaseDate)) {
+                    console.log("New Group:", BaseDate);
+                    _dates[BaseDate] = {};
                 }
-                if(!_locations[key].hasOwnProperty(MMSI)) {
-                    _locations[key][MMSI] = 0;
+                if(!_dates[BaseDate].hasOwnProperty(MMSI)) {
+                    _dates[BaseDate][MMSI] = 0;
                 }
-                _locations[key][MMSI]++;
-            }
+                _dates[key][MMSI]++;
         });
     } else {
         console.error("Could not find the filename:", filename);

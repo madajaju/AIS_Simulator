@@ -1,4 +1,4 @@
-wget https://coast.noaa.gov/htdata/CMSP/AISDataHandler/2022/AIS_2022_01_01.zip && unzip AIS_2022_01_01.zip && rm AIS_2022_01_01.zip
+curl https://coast.noaa.gov/htdata/CMSP/AISDataHandler/2022/AIS_2022_01_01.zip && unzip AIS_2022_01_01.zip && rm AIS_2022_01_01.zip
 wget https://coast.noaa.gov/htdata/CMSP/AISDataHandler/2022/AIS_2022_01_02.zip && unzip AIS_2022_01_02.zip && rm AIS_2022_01_02.zip
 wget https://coast.noaa.gov/htdata/CMSP/AISDataHandler/2022/AIS_2022_01_03.zip && unzip AIS_2022_01_03.zip && rm AIS_2022_01_03.zip
 wget https://coast.noaa.gov/htdata/CMSP/AISDataHandler/2022/AIS_2022_01_04.zip && unzip AIS_2022_01_04.zip && rm AIS_2022_01_04.zip

@@ -2,11 +2,20 @@
   "name": "AIS_Simulator",
   "version": "1.0.0",
   "scripts": {
-    "processAIS1": "node processAISFile.js --file ../../Downloads/AIS/AIS_2022_01_01.csv --dir ships",
-    "processAIS2": "node processAISFile.js --file ../../Downloads/AIS/AIS_2022_01_02.csv --dir ships",
+    "processAIS1": "node processAISFile.js --file date/AIS_2022_01_01.csv --dir ships",
+    "processAIS2": "node processAISFile.js --file date/AIS_2022_01_02.csv --dir ships",
+    "processAIS3": "node processAISFile.js --file date/AIS_2022_01_03.csv --dir ships",
+    "processAIS4": "node processAISFile.js --file date/AIS_2022_01_04.csv --dir ships",
+    "processAIS5": "node processAISFile.js --file date/AIS_2022_01_05.csv --dir ships",
     "transmit": "node shipSim.js --files ships/215071000.csv",
     "findMoving": "node findMoving.js --dir ships",
-    "findGroups": "node findGroups.js --dir ships"
+    "findGroups": "node findGroups.js --dir ships",
+    "createUSV": "node createUSVData.js --source ships --area 27_-92 --destination usv",
+    "ucOne": "node ucOne.js --files ships/1072211352.csv",
+    "ucTwo": "node --max-old-space-size=6152 ucTwo.js --dates date --usv usv",
+    "ucThree": "node --max-old-space-size=6152 ucThree.js --dates date --usv usv",
+    "ucFour": "node --max-old-space-size=6152 ucFour.js --dates date --usv usv",
+    "ucFive": "node --max-old-space-size=6152 ucFive.js --dates date --usv usv"
   },
   "dependencies": {
     "commander": "^10.0.0",
