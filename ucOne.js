@@ -7,12 +7,18 @@ const noContactTrigger = 20 * 60 * 1000;
 
 program
     .option('-f, --files <filenames>')
+    .option('-s, --ships <directory>')
 
 program.parse();
 
 const options = program.opts();
-
-let filenames = options.files.split(/,/);
+let _stats = {};
+let filenames = [];
+if(options.ships) {
+	filenames = fs.readdirSync(options.ships).map((filename) => { return `${options.ships}/${filename}` });
+} else {
+	filenames = options.files.split(/,/);
+}
 
 let _ships = new Map();
 
@@ -55,6 +61,7 @@ for (let i in filenames) {
         process.exit(0);
     }
 }
+console.log("Stats:", _stats);
 
 function transmit(sortedTransmit, current) {
     while(sortedTransmit.length > 0) {
@@ -62,7 +69,10 @@ function transmit(sortedTransmit, current) {
         const difference = current.BaseDateTime - next.BaseDateTime;
         if(!isNaN(difference)) {
             if (Math.abs(difference) > noContactTrigger) {
-                console.log("ship.nocontact:" + difference + ":" + current.MMSI);
+		if(!_stats.hasOwnProperty(current.MMSI)) {
+			_stats[current.MMSI]= 0;
+		}
+                _stats[current.MMSI]++;
             }
         }
         current = next;

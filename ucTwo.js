@@ -20,18 +20,16 @@ let usvs = fs.readdirSync(usvDir);
 
 let _stats = {};
 let _ships = new Map();
-_ships.date = '';
-_ships.time = new Map();
 
 const TIME_WINDOW = 7 * 60 * 1000; // 20 minutes
-const HOUR_WINDOW = 24; // 6 hours
+const HOUR_WINDOW = 12; // 6 hours
 
 const _processUSV = (usvs) => {
     let uname = usvs.pop();
+    console.log("Analyzing USV:", uname);
     let startTime = new Date();
     if (uname) {
         let hitsFile = path.resolve(`${usvDir}/${uname}/hits.csv`);
-        let count = 0;
         const usvStream = fs.createReadStream(hitsFile)
             .pipe(es.split())
             .pipe(es.mapSync((line) => {
@@ -41,27 +39,28 @@ const _processUSV = (usvs) => {
                         let [hour, minute] = time.split(':');
                         // Open the date file and then find the BaseDateTime within 6 minutes.
                         _loadDateFile(options.dates, day, hour);
+			let dateKey = `${day}.${Math.floor(hour / HOUR_WINDOW)}`;
                         // Now Check
                         // calculate time window
                         let baseTime = new Date(BaseDateTime);
                         let timeKey = Math.floor(baseTime / (TIME_WINDOW / 2));
                         for (let offset = -1; offset <= 1; offset++) {
                             let key = timeKey + offset;
-                            if (_ships.time[key]) {
-                                let ships = _ships.time[key];
-                                for (let i in ships) {
-                                    // Find the ship and check if the track data is different.
-                                    if (MMSI == ships[i].MMSI) {
-                                        // Check that the tracks are the same.
-                                        if (LAT !== ships[i].LAT || LONG !== ships[i].LONG) {
-                                            if (!_stats.hasOwnProperty(ships[i].MMSI)) {
-                                                _stats[ships[i].MMSI] = 0;
-                                            }
-                                            _stats[ships[i].MMSI]++;
-                                        }
-                                    }
-                                }
-                            }
+                            if (_ships[dateKey].time[key]) {
+                                let ships = _ships[dateKey].time[key];
+				if(ships.hasOwnProperty(MMSI)) {
+					for(let i in ships[MMSI]) {
+						let point = ships[MMSI][i];
+						// Check that the tracks are the same.
+						if (LAT !== point.LAT || LONG !== point.LONG) {
+						    if (!_stats.hasOwnProperty(MMSI)) {
+							_stats[MMSI] = 0;
+						    }
+						    _stats[MMSI]++;
+						}
+					}
+                                 }
+			     }
                         }
                     }
                 })
@@ -77,13 +76,14 @@ const _processUSV = (usvs) => {
 }
 
 const _loadDateFile = (dir, day, hour) => {
-    if (_ships.date !== `${day}.${Math.floor(hour / HOUR_WINDOW)}`) {
-        let currentDate = new Date();
-        console.log("Loading day file:", day, hour);
-        _ships.time = null;
-        _ships.date = `${day}.${Math.floor(hour / HOUR_WINDOW)}`;
-        _ships.time = new Map();
+	let dateKey = `${day}.${Math.floor(hour / HOUR_WINDOW)}`;
+    if (!_ships.hasOwnProperty(dateKey)) {
+	_ships = null;
+	_ships = {};
+	_ships[dateKey] = { time: new Map() };
         const dayAISFile = path.resolve(`${dir}/AIS_${day.replaceAll('-', '_')}.csv`);
+	console.log("Loading file:", dayAISFile);
+	console.log(process.memoryUsage());
         if (!fs.existsSync(dayAISFile)) {
             return;
         }
@@ -99,18 +99,18 @@ const _loadDateFile = (dir, day, hour) => {
             lines = buffer.toString('utf-8', 0, read).split('\n');
             lines[0] = leftOver + lines[0];
             while (lines.length > 1) {
-                _parseLine(lines.shift(), Math.floor(hour / HOUR_WINDOW));
+                _parseLine(lines.shift(), Math.floor(hour / HOUR_WINDOW), dateKey);
                 lineCount++;
             }
             leftOver = lines.shift();
         }
         if (leftOver) {
-            _parseLine(leftOver, Math.floor(hour / HOUR_WINDOW));
+            _parseLine(leftOver, Math.floor(hour / HOUR_WINDOW),dateKey);
         }
-        console.log("Time to Get file:", currentDate - new Date());
+	console.log("Done Loading:", process.memoryUsage());
     }
 }
-const _parseLine = (pLine, pHour) => {
+const _parseLine = (pLine, pHour, dateKey) => {
     let [MMSI, BaseDateTime, LAT, LONG, SOG, COG, Heading, VesselName, IMO, CallSign, VesselType, Status, Length, Width, Draft, Cargo, TransceiverClass] = pLine.split(/,/);
     let [day, time] = BaseDateTime.split('T');
     let [hour, minute] = time.split(':');
@@ -136,10 +136,13 @@ const _parseLine = (pLine, pHour) => {
         }
         let baseTime = new Date(BaseDateTime);
         let key = Math.floor(baseTime / (TIME_WINDOW / 2));
-        if (!_ships.time.hasOwnProperty(key)) {
-            _ships.time[key] = [];
+        if (!_ships[dateKey].time.hasOwnProperty(key)) {
+            _ships[dateKey].time[key] = {};
         }
-        _ships.time[key].push(jsonline);
+	if(!_ships[dateKey].time[key].hasOwnProperty(MMSI)) {
+		_ships[dateKey].time[key][MMSI] = [];
+	}
+        _ships[dateKey].time[key][MMSI].push(jsonline);
     }
 }
 
