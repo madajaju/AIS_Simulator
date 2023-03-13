@@ -26,6 +26,7 @@ for (let i in filenames) {
     let fileString = filenames[i];
     let filename = path.resolve(`./${fileString}`);
     let items = [];
+    console.log("Checking Ship:", filename);
     if (fs.existsSync(filename)) {
         let str = fs.readFileSync(filename).toString('utf-8');
         str.split(/\n/).forEach((line) => {
@@ -58,7 +59,6 @@ for (let i in filenames) {
         transmit(sortedTransmit, current);
     } else {
         console.error("Could not find the filename:", filename);
-        process.exit(0);
     }
 }
 console.log("Stats:", _stats);
