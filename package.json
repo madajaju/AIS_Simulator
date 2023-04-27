@@ -28,7 +28,8 @@
     "ucTwo": "node --max-old-space-size=64152 ucTwo.js --dates date --usv usv",
     "ucThree": "node --max-old-space-size=6152 ucThree.js --dates date --usv usv",
     "ucFour": "node --max-old-space-size=6152 ucFour.js --dates date --usv usv",
-    "ucFive": "node --max-old-space-size=6152 ucFive.js --dates date --usv usv"
+    "ucFive": "node --max-old-space-size=6152 ucFive.js --dates date --usv usv",
+	"ucAll": "time npm run ucOne && time npm run ucTwo && time npm run ucThree && time npm run ucFour && time npm run ucFive"
   },
   "dependencies": {
     "commander": "^10.0.0",

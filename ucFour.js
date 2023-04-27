@@ -56,7 +56,7 @@ const _processUSV = (usvs) => {
                             let i = 0;
                             let found = false;
                             while (i < ships.length && !found) {
-                                let point = ships[i];
+                                let point = ships[i++];
                                 // If the time is within a minute 60,000 milliseconds.
                                 if (Math.abs(upoint.BaseDateTime - point.BaseDateTime) < 60000) {
                                     // Check that the tracks are the same.
